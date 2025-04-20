@@ -1,0 +1,101 @@
+npx create-react-app ecommerce-ui
+cd ecommerce-ui
+npm install @mui/material @emotion/react @emotion/styled react-router-dom
+
+//App.js
+import React from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import Products from "./pages/Products";
+import Contact from "./pages/Contact";
+import "./App.css";
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/products" element={<Products />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
+
+//Navbar.js
+import React from "react";
+import { AppBar, Toolbar, Typography, Button } from "@mui/material";
+import { Link } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <AppBar position="static">
+      <Toolbar>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+          E-Shop
+        </Typography>
+        <Button color="inherit" component={Link} to="/">
+          Home
+        </Button>
+        <Button color="inherit" component={Link} to="/products">
+          Products
+        </Button>
+        <Button color="inherit" component={Link} to="/contact">
+          Contact
+        </Button>
+      </Toolbar>
+    </AppBar>
+  );
+};
+
+export default Navbar;
+
+//ProductCard.js
+import React from "react";
+import { Card, CardMedia, CardContent, Typography, Button } from "@mui/material";
+
+const ProductCard = ({ product }) => {
+  return (
+    <Card sx={{ maxWidth: 345, margin: 2 }}>
+      <CardMedia component="img" height="200" image={product.image} alt={product.name} />
+      <CardContent>
+        <Typography variant="h6">{product.name}</Typography>
+        <Typography color="text.secondary">${product.price}</Typography>
+        <Button variant="contained" color="primary">
+          Buy Now
+        </Button>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default ProductCard;
+
+//Products.js
+import React from "react";
+import ProductCard from "../components/ProductCard";
+import { Grid } from "@mui/material";
+
+const products = [
+  { id: 1, name: "Smartphone", price: 299, image: "https://via.placeholder.com/150" },
+  { id: 2, name: "Laptop", price: 799, image: "https://via.placeholder.com/150" },
+  { id: 3, name: "Headphones", price: 49, image: "https://via.placeholder.com/150" },
+];
+
+const Products = () => {
+  return (
+    <Grid container spacing={2} justifyContent="center">
+      {products.map((product) => (
+        <Grid item key={product.id}>
+          <ProductCard product={product} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+};
+
+export default Products;

@@ -1,0 +1,195 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: AuthScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class AuthScreen extends StatefulWidget {
+  const AuthScreen({super.key});
+
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  bool showLogin = true;
+
+  void toggleForm() {
+    setState(() {
+      showLogin = !showLogin;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return showLogin
+        ? LoginForm(onToggle: toggleForm)
+        : RegistrationForm(onToggle: toggleForm);
+  }
+}
+
+class RegistrationForm extends StatefulWidget {
+  final VoidCallback onToggle;
+
+  const RegistrationForm({super.key, required this.onToggle});
+
+  @override
+  State<RegistrationForm> createState() => _RegistrationFormState();
+}
+
+class _RegistrationFormState extends State<RegistrationForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  void _register() {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Registration Successful')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Register'),
+        actions: [
+          TextButton(
+            onPressed: widget.onToggle,
+            child: const Text('Login', style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                key: const Key('nameField'),
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Full Name'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter full name' : null,
+              ),
+              TextFormField(
+                key: const Key('phoneField'),
+                controller: _phoneController,
+                decoration: const InputDecoration(labelText: 'Phone Number'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter phone number' : null,
+              ),
+              TextFormField(
+                key: const Key('emailField'),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter email' : null,
+              ),
+              TextFormField(
+                key: const Key('passwordField'),
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+                validator: (value) =>
+                    value!.length < 6 ? 'Min 6 characters' : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                key: const Key('registerButton'),
+                onPressed: _register,
+                child: const Text("Register"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class LoginForm extends StatefulWidget {
+  final VoidCallback onToggle;
+
+  const LoginForm({super.key, required this.onToggle});
+
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+
+  void _login() {
+    if (_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Login Successful')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
+        actions: [
+          TextButton(
+            onPressed: widget.onToggle,
+            child: const Text('Register', style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                key: const Key('loginEmailField'),
+                controller: _emailController,
+                decoration: const InputDecoration(labelText: 'Email'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter email' : null,
+              ),
+              TextFormField(
+                key: const Key('loginPasswordField'),
+                controller: _passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(labelText: 'Password'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Enter password' : null,
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                key: const Key('loginButton'),
+                onPressed: _login,
+                child: const Text("Login"),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

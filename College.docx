@@ -1,0 +1,96 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(CollegeApp());
+}
+
+class CollegeApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'XYZ College',
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+      ),
+      home: HomePage(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class HomePage extends StatelessWidget {
+  final List<String> announcements = [
+    "Semester exams begin from May 2nd.",
+    "Admissions open for 2025 batch.",
+    "Placement drive on April 28th.",
+    "Library will remain closed on Sunday."
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          children: [
+            Image.asset('assets/logo.png', height: 40), // Add your logo in assets folder
+            SizedBox(width: 10),
+            Text('XYZ College of Engineering'),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView(
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.indigo),
+              child: Text('Menu', style: TextStyle(color: Colors.white, fontSize: 24)),
+            ),
+            ListTile(title: Text("About Us")),
+            ListTile(title: Text("Academics")),
+            ListTile(title: Text("Library")),
+            ListTile(title: Text("Placements")),
+            ListTile(title: Text("Admissions")),
+          ],
+        ),
+      ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Row(
+            children: [
+              if (constraints.maxWidth > 600)
+                NavigationRail(
+                  selectedIndex: 0,
+                  destinations: [
+                    NavigationRailDestination(icon: Icon(Icons.info), label: Text("About Us")),
+                    NavigationRailDestination(icon: Icon(Icons.school), label: Text("Academics")),
+                    NavigationRailDestination(icon: Icon(Icons.library_books), label: Text("Library")),
+                    NavigationRailDestination(icon: Icon(Icons.work), label: Text("Placements")),
+                    NavigationRailDestination(icon: Icon(Icons.app_registration), label: Text("Admissions")),
+                  ],
+                  labelType: NavigationRailLabelType.all,
+                ),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text("📢 Announcements", style: Theme.of(context).textTheme.headline6),
+                      SizedBox(height: 10),
+                      ...announcements.map((announcement) => Card(
+                        child: ListTile(
+                          leading: Icon(Icons.announcement),
+                          title: Text(announcement),
+                        ),
+                      )),
+                    ],
+                  ),
+                ),
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
+}

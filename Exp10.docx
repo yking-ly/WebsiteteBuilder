@@ -1,0 +1,11 @@
+npm install gh-pages --save-dev
+package.json:"homepage": "https://your-username.github.io/your-repo-name"
+scripts:"predeploy": "npm run build",
+"deploy": "gh-pages -d build"
+npm run deploy
+
+src/index.js
+import { BrowserRouter } from 'react-router-dom';
+<BrowserRouter basename="/your-repo-name">
+  <App />
+</BrowserRouter>

@@ -1,0 +1,172 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(); // Initialize Firebase
+  runApp(RestaurantApp());
+}
+
+class RestaurantApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Restaurant Table Booking',
+      theme: ThemeData(primarySwatch: Colors.green),
+      home: RegistrationForm(),
+    );
+  }
+}
+
+class RegistrationForm extends StatefulWidget {
+  @override
+  _RegistrationFormState createState() => _RegistrationFormState();
+}
+
+class _RegistrationFormState extends State<RegistrationForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController guestsController = TextEditingController();
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+
+  Future<void> _submitForm() async {
+    if (_formKey.currentState!.validate() &&
+        selectedDate != null &&
+        selectedTime != null) {
+      final bookingDateTime = DateTime(
+        selectedDate!.year,
+        selectedDate!.month,
+        selectedDate!.day,
+        selectedTime!.hour,
+        selectedTime!.minute,
+      );
+
+      await FirebaseFirestore.instance.collection('bookings').add({
+        'name': nameController.text,
+        'phone': phoneController.text,
+        'email': emailController.text,
+        'guests': int.parse(guestsController.text),
+        'bookingDateTime': bookingDateTime.toString(),
+        'timestamp': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Booking Successful!')),
+      );
+
+      _formKey.currentState!.reset();
+      setState(() {
+        selectedDate = null;
+        selectedTime = null;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Please complete all fields')),
+      );
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(Duration(days: 60)),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  Future<void> _pickTime() async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        selectedTime = picked;
+      });
+    }
+  }
+
+  String _formatDateTime() {
+    if (selectedDate == null || selectedTime == null) return "Select Date & Time";
+    final dt = DateTime(
+      selectedDate!.year,
+      selectedDate!.month,
+      selectedDate!.day,
+      selectedTime!.hour,
+      selectedTime!.minute,
+    );
+    return "${dt.day}/${dt.month}/${dt.year} ${selectedTime!.format(context)}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Table Booking Form')),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: [
+              TextFormField(
+                controller: nameController,
+                decoration: InputDecoration(labelText: 'Full Name'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter your name' : null,
+              ),
+              TextFormField(
+                controller: phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: InputDecoration(labelText: 'Phone Number'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter phone number' : null,
+              ),
+              TextFormField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(labelText: 'Email'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter email' : null,
+              ),
+              TextFormField(
+                controller: guestsController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Number of Guests'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter number of guests' : null,
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _pickDate,
+                child: Text(selectedDate == null
+                    ? "Pick Booking Date"
+                    : "Date: ${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}"),
+              ),
+              ElevatedButton(
+                onPressed: _pickTime,
+                child: Text(selectedTime == null
+                    ? "Pick Booking Time"
+                    : "Time: ${selectedTime!.format(context)}"),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _submitForm,
+                child: Text('Submit Booking'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

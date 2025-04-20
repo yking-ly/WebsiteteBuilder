@@ -1,0 +1,40 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:your_app/main.dart'; // Replace with your actual package name
+
+void main() {
+  group('Authentication Forms Tests', () {
+    testWidgets('Login form validation and success test', (WidgetTester tester) async {
+      await tester.pumpWidget(const MyApp());
+
+      // Enter email and password
+      await tester.enterText(find.byKey(const Key('loginEmailField')), 'user@example.com');
+      await tester.enterText(find.byKey(const Key('loginPasswordField')), 'password123');
+
+      // Tap Login
+      await tester.tap(find.byKey(const Key('loginButton')));
+      await tester.pump();
+
+      // Expect success snackbar
+      expect(find.text('Login Successful'), findsOneWidget);
+    });
+
+    testWidgets('Switch to registration and validate empty form', (WidgetTester tester) async {
+      await tester.pumpWidget(const MyApp());
+
+      // Tap Register on the top right
+      await tester.tap(find.text('Register'));
+      await tester.pumpAndSettle();
+
+      // Tap Register button without entering any data
+      await tester.tap(find.byKey(const Key('registerButton')));
+      await tester.pump();
+
+      // Check for all required field errors
+      expect(find.text('Enter full name'), findsOneWidget);
+      expect(find.text('Enter phone number'), findsOneWidget);
+      expect(find.text('Enter email'), findsOneWidget);
+      expect(find.text('Min 6 characters'), findsOneWidget);
+    });
+  });
+}

@@ -1,0 +1,69 @@
+// service-worker.js
+
+const CACHE_NAME = 'eshop-cache-v1';
+const urlsToCache = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/favicon.ico',
+  '/static/js/bundle.js',
+  '/static/js/main.chunk.js',
+  '/static/js/0.chunk.js',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png'
+];
+
+// Install Service Worker
+self.addEventListener('install', event => {
+  console.log('[Service Worker] Installing...');
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      console.log('[Service Worker] Caching all content');
+      return cache.addAll(urlsToCache);
+    })
+  );
+});
+
+// Activate Service Worker
+self.addEventListener('activate', event => {
+  console.log('[Service Worker] Activated!');
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('[Service Worker] Deleting old cache:', key);
+            return caches.delete(key);
+          }
+        })
+      )
+    )
+  );
+});
+
+// Fetch Data from Cache or Network
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
+  );
+});
+
+//src/index.js or main.jsx
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/service-worker.js')
+      .then(registration => {
+        console.log('✅ Service Worker registered with scope:', registration.scope);
+      })
+      .catch(error => {
+        console.error('❌ Service Worker registration failed:', error);
+      });
+  });
+}
+
+npm run build
+serve -s build
+npm install -g serve

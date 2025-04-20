@@ -1,0 +1,86 @@
+import 'package:flutter/material.dart';
+
+void main() => runApp(MyApp());
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Restaurant App',
+      theme: ThemeData(primarySwatch: Colors.teal),
+      home: DisplayPage(),
+    );
+  }
+}
+
+class DisplayPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Restaurant')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 300,
+              height: 300,
+              color: Colors.grey[300],
+              child: Center(child: Text('Restaurant Image')),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MenuPage()),
+          );
+        },
+        child: Icon(Icons.add),
+      ),
+    );
+  }
+}
+
+class MenuPage extends StatelessWidget {
+  final List<Map<String, String>> menuItems = [
+    {'name': 'Pizza', 'price': 'Rs. 200'},
+    {'name': 'Burger', 'price': 'Rs. 150'},
+    {'name': 'Pasta', 'price': 'Rs. 180'},
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Food Menu')),
+      body: ListView.builder(
+        itemCount: menuItems.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: EdgeInsets.all(10),
+            child: Row(
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  color: Colors.grey[300],
+                  child: Center(child: Text('Food Image')),
+                ),
+                SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(menuItems[index]['name']!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    Text(menuItems[index]['price']!, style: TextStyle(fontSize: 16)),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
+
+void main() => runApp(CalculatorApp());
+
+class CalculatorApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Calculator',
+      home: CalculatorHome(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+class CalculatorHome extends StatefulWidget {
+  @override
+  _CalculatorHomeState createState() => _CalculatorHomeState();
+}
+
+class _CalculatorHomeState extends State<CalculatorHome> {
+  String expression = '';
+
+  void buttonPressed(String buttonText) {
+    setState(() {
+      if (buttonText == 'C') {
+        expression = '';
+      } else if (buttonText == '=') {
+        try {
+          Parser p = Parser();
+          Expression exp = p.parse(expression);
+          ContextModel cm = ContextModel();
+          double eval = exp.evaluate(EvaluationType.REAL, cm);
+          expression = eval.toString();
+        } catch (e) {
+          expression = "Error";
+        }
+      } else {
+        expression += buttonText;
+      }
+    });
+  }
+
+  Widget buildButton(String text) {
+    return Expanded(
+      child: OutlinedButton(
+        onPressed: () => buttonPressed(text),
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Calculator'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              alignment: Alignment.bottomRight,
+              padding: EdgeInsets.all(24),
+              child: Text(
+                expression,
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Row(children: [buildButton('C'), buildButton('='), buildButton('-'), buildButton('+')]),
+              Row(children: [buildButton('*'), buildButton('/'), buildButton('0'), buildButton('1')]),
+              Row(children: [buildButton('2'), buildButton('3'), buildButton('4'), buildButton('5')]),
+              Row(children: [buildButton('6'), buildButton('7'), buildButton('8'), buildButton('9')]),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
